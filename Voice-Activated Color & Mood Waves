@@ -1,0 +1,33 @@
+let audioModelURL = 'https://teachablemachine.withgoogle.com/models/PASTE_YOUR_MODEL_ID_HERE/';
+
+let classifier, label = "Say Red, Blue, or Green...", pulseColor, ringSize = 40;
+
+function preload() {
+  classifier = ml5.soundClassifier(audioModelURL + 'model.json', { probabilityThreshold: 0.80 });
+}
+
+function setup() {
+  createCanvas(640, 480);
+  pulseColor = color(200);
+  classifier.classify(gotResult);
+}
+
+function gotResult(err, res) {
+  if (!err && res.length > 0) {
+    label = res[0].label;
+    let word = label.toLowerCase();
+    if (word.includes("red")) { pulseColor = color(255, 60, 60); ringSize = 300; }
+    if (word.includes("blue")) { pulseColor = color(60, 140, 255); ringSize = 300; }
+    if (word.includes("green")) { pulseColor = color(60, 220, 120); ringSize = 300; }
+  }
+}
+
+function draw() {
+  background(25);
+  noFill(); stroke(pulseColor); strokeWeight(8);
+  ellipse(width / 2, height / 2 - 20, ringSize);
+  ringSize = lerp(ringSize, 100, 0.06);
+
+  noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(24);
+  text("Voice Command: " + label, width / 2, height - 60);
+}
